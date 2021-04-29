@@ -1,19 +1,22 @@
 import React, {useState} from 'react'
 import Loading from './Loading'
 
-function Dropbox() {
+function Dropbox({token}) {
   const [file, setFile] = useState(null)
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [languageCode, setLanguageCode] = useState('en-US_BroadbandModel')
   
-  const submit = () => {
+  const submit = ({getToken}) => {
     setLoading(true)
     let formData = new FormData()
     formData.append("file", file)
     formData.append('languageCode', languageCode)
     fetch('http://localhost:4000/transcript', {
       method: 'POST',
+      headers: {
+        authorization: getToken()
+      },
       body: formData
     })
       .then(res => res.json())
@@ -22,6 +25,7 @@ function Dropbox() {
         setLoading(false)
       })
   }
+
   return (
     <>
     <div className="mt-6 flex justify-center pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md relative">
@@ -49,7 +53,7 @@ function Dropbox() {
     </div>
     <div className="flex justify-center mt-6">
       <button type="button" onClick={()=> submit()} disabled={!file && loading} className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow">
-        {loading ? <Loading /> : 'Submit'}
+        {loading ? [<Loading />, 'Processing'] : 'Submit'}
       </button>
     </div>
     <div className=" mt-6">
