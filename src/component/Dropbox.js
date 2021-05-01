@@ -1,17 +1,20 @@
 import React, {useState} from 'react'
 import Loading from './Loading'
 
-function Dropbox({token}) {
+function Dropbox({getToken, logout}) {
   const [file, setFile] = useState(null)
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [languageCode, setLanguageCode] = useState('en-US_BroadbandModel')
+  const [objectUrl, setObjectUrl] = useState('')
+  const [fileDuration, setFileDuration] = useState('')
   
-  const submit = ({getToken}) => {
+  const submit = () => {
     setLoading(true)
     let formData = new FormData()
     formData.append("file", file)
     formData.append('languageCode', languageCode)
+    formData.append('fileDuration', fileDuration)
     fetch('http://localhost:4000/transcript', {
       method: 'POST',
       headers: {
@@ -26,8 +29,15 @@ function Dropbox({token}) {
       })
   }
 
+  const onChange = (file) => {
+    setFile(file)
+    setObjectUrl(URL.createObjectURL(file))
+  }
+
   return (
     <>
+    <h1 className='text-lg font-medium leading-6'>Speech To Text</h1>
+    <button onClick={()=> logout()}>logout</button>
     <div className="mt-6 flex justify-center pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md relative">
       <div className="space-y-1 text-center">
         <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
@@ -49,13 +59,14 @@ function Dropbox({token}) {
         </>
         }
       </div>
-      <input id="file-upload" name="file-upload" type="file" className="file-upload" onChange={({target}) => setFile(target.files[0])} />
+      <input id="file-upload" name="file-upload" type="file" className="file-upload" onChange={({target}) => onChange(target.files[0])} />
     </div>
     <div className="flex justify-center mt-6">
       <button type="button" onClick={()=> submit()} disabled={!file && loading} className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow">
         {loading ? [<Loading />, 'Processing'] : 'Submit'}
       </button>
     </div>
+    <audio src={objectUrl} onCanPlayThrough={({currentTarget}) => setFileDuration(parseInt(currentTarget.duration))}></audio>
     <div className=" mt-6">
       <textarea type="text" value={content} onChange={({target}) => setContent(target.value)} rows="7" className={"shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"} />
     </div>

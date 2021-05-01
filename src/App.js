@@ -4,7 +4,7 @@ import Dropbox from './component/Dropbox'
 import Login from './component/Login'
 
 const App = () => {
-  const [currentUser, setCurrentUser] = useState({})
+  const [currentUser, setCurrentUser] = useState(null)
   useEffect(() => {
     fetch('http://localhost:4000/current-user', {
       method: 'GET',
@@ -24,17 +24,21 @@ const App = () => {
 
   const logout = () => {
     document.cookie = 'token='
-    setCurrentUser({})
+    setCurrentUser(null)
+  }
+
+  useEffect(()=>{
+    console.log(currentUser)
+  },[currentUser])
+  const method = (value) => {
+    debugger
   }
 
   return (
-    <div className="App">
+    <div className="App bg-gray-50 flex">
       <div className='container mx-auto px-6 mt-6'>
-        <h1 className='text-lg font-medium leading-6'>Speech To Text</h1>
-        {currentUser && <button onClick={()=> logout()}>logout</button>}
-        <Dropbox getToken={()=> getToken} />
+        {currentUser ? <Dropbox getToken={()=> getToken()} logout={()=>logout()} /> : <Login method={(value)=>method(value)} setCurrentUser={(value) => setCurrentUser(value)} />}
       </div>
-      {!currentUser && <Login setCurrentUser={() => setCurrentUser} />}
     </div>
   )
 }
