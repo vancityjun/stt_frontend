@@ -23,8 +23,9 @@ function Dropbox({getToken, logout}) {
       body: formData
     })
       .then(res => res.json())
-      .then((result) => {
-        setContent(result.results[0].alternatives[0].transcript)
+      .then(({results}) => {
+        const _content = results.map(({alternatives}) => alternatives[0].transcript).join('')
+        setContent(_content)
         setLoading(false)
       })
   }

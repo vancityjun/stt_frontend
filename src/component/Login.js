@@ -7,9 +7,21 @@ const reducer = (state, { target }) => {
 
 function Login({setCurrentUser}) {
   const [register, setRegister] = useState(false)
+  const [resetPassword, setResetPassword] = useState(false)
   const [state, dispatch] = useReducer(reducer, {})
 
   const submit = () => {
+    // if(resetPassword) {
+    //   fetch(`http://localhost:4000/password-reset`, {
+    //     method: 'POST',
+    //     body: JSON.stringify({userParams: state})
+    //   })
+    //     .then(res => res.json())
+    //     .then((result) => {
+    //       console.log(result)
+    //     })
+    // }
+
     fetch(`http://localhost:4000/${register ?'register' : 'login'}`, {
       method: 'POST',
       body: JSON.stringify({userParams: state})
@@ -40,11 +52,12 @@ function Login({setCurrentUser}) {
           <div className="rounded-md shadow-sm -space-y-px">
             <Field onChange={(value) => dispatch({ target: { email: value } })} title='email' type="email" placeholder="Email address" />
             <Field onChange={(value) => dispatch({ target: { password: value } })} title='password' type="password" placeholder="Password" />
+            {(resetPassword || register) && <Field onChange={(value) => dispatch({ target: { passwordConfirm: value } })} title='password confirm' type="password" placeholder="Password confirm" />}
             {register && [
-              <Field onChange={(value) => dispatch({ target: { passwordConfirm: value } })} title='password confirm' type="password" placeholder="Password confirm" />,
               <Field onChange={(value) => dispatch({ target: { firstName: value } })} title='first name' type="text" placeholder="First name" />,
               <Field onChange={(value) => dispatch({ target: { lastName: value } })} title='last name' type="text" placeholder="Last name" />,
-            ]}
+            ]
+            }
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -54,7 +67,7 @@ function Login({setCurrentUser}) {
               </label>
             </div>
             <div className="text-sm">
-              <button onClick={()=>{}} className="font-medium text-indigo-600 hover:text-indigo-500">
+              <button onClick={()=> setResetPassword(true)} className="font-medium text-indigo-600 hover:text-indigo-500">
                 Forgot your password?
               </button>
             </div>
